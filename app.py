@@ -32,7 +32,7 @@ class SRCNN(nn.Module):
         return x
 
 # ============================
-# LOAD MODEL FROM DRIVE
+# LOAD MODEL FROM DRIVE (cached)
 # ============================
 @st.cache_resource
 def load_model():
@@ -42,6 +42,9 @@ def load_model():
     model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
     model.eval()
     return model
+
+# Load model ONCE when app runs
+model = load_model()
 
 # ============================
 # PREPROCESS IMAGE
@@ -72,7 +75,6 @@ if uploaded_file:
     image = Image.open(uploaded_file).convert("L")
     st.image(image.resize((512, 512), resample=Image.BICUBIC), caption="Low-Resolution Input", use_column_width=True)
 
-    model = load_model()
     input_tensor = preprocess(image)
 
     with torch.no_grad():
